@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AutoElite — Premium Car Dealership</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f9f8f6;
+    --surface: #ffffff;
+    --text: #1a1a1a;
+    --muted: #888;
+    --accent: #c8a96e;
+    --accent-dark: #a8863e;
+    --border: #e8e4de;
+    --nav-h: 68px;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: var(--nav-h); background: rgba(249,248,246,0.96);
+    backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px;
+  }
+  .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; letter-spacing: 0.04em; color: var(--text); cursor: pointer; }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 32px; list-style: none; margin-left: auto; }
+  .nav-links li a {
+    font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none; font-weight: 500;
+    transition: color 0.2s; cursor: pointer;
+  }
+  .nav-links li a:hover, .nav-links li a.active { color: var(--text); }
+
+  /* PAGES */
+  .page { display: none; min-height: 100vh; padding-top: var(--nav-h); animation: fadeIn 0.4s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* HERO */
+  .hero {
+    height: calc(100vh - var(--nav-h)); display: flex; align-items: center;
+    padding: 0 80px; position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #f0ebe2 0%, #e8e0d0 60%, #d4c9b0 100%);
+  }
+  .hero-accent {
+    position: absolute; right: -80px; top: 50%; transform: translateY(-50%);
+    width: 520px; height: 520px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,169,110,0.18) 0%, transparent 70%);
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 640px; }
+  .hero-eyebrow { font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+  .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(3rem, 6vw, 5.5rem); font-weight: 300; line-height: 1.05; margin-bottom: 24px; }
+  .hero-title strong { font-weight: 700; display: block; }
+  .hero-sub { font-size: 1rem; color: var(--muted); line-height: 1.7; max-width: 460px; margin-bottom: 40px; }
+  .btn-primary {
+    display: inline-block; background: var(--text); color: #fff;
+    padding: 16px 40px; font-size: 0.8rem; letter-spacing: 0.12em;
+    text-transform: uppercase; font-weight: 500; border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: background 0.2s;
+    text-decoration: none;
+  }
+  .btn-primary:hover { background: var(--accent); }
+  .btn-outline {
+    display: inline-block; border: 1.5px solid var(--text); color: var(--text);
+    padding: 15px 36px; font-size: 0.8rem; letter-spacing: 0.12em;
+    text-transform: uppercase; font-weight: 500; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; background: transparent;
+    transition: all 0.2s; text-decoration: none; margin-left: 16px;
+  }
+  .btn-outline:hover { background: var(--text); color: #fff; }
+  .stats-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: var(--text); display: flex;
+  }
+  .stat { flex: 1; padding: 22px 32px; border-right: 1px solid rgba(255,255,255,0.1); }
+  .stat:last-child { border-right: none; }
+  .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--accent); font-weight: 600; }
+  .stat-label { font-size: 0.72rem; color: rgba(255,255,255,0.5); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+
+  /* SECTIONS */
+  .section { padding: 100px 80px; }
+  .section-sm { padding: 60px 80px; }
+  .section-eyebrow { font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 300; margin-bottom: 16px; }
+  .section-sub { font-size: 0.95rem; color: var(--muted); line-height: 1.7; max-width: 560px; }
+  .divider { height: 1px; background: var(--border); margin: 0 80px; }
+
+  /* CARDS */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 48px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); overflow: hidden;
+    transition: box-shadow 0.3s, transform 0.3s;
+  }
+  .card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.08); transform: translateY(-4px); }
+  .card-img {
+    height: 200px; display: block; overflow: hidden; background: #e8e0d0;
+  }
+  .card-img img {
+    width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;
+  }
+  .card:hover .card-img img { transform: scale(1.05); }
+  .card-body { padding: 24px; }
+  .card-tag { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 600; margin-bottom: 8px; }
+  .card-text { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+  .card-price { font-size: 1.1rem; font-weight: 500; margin-top: 16px; }
+  .card-price span { color: var(--accent); }
+  .card-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+
+  /* FORM */
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 12px 16px; border: 1px solid var(--border);
+    background: var(--bg); font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; color: var(--text); outline: none; transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-box { background: var(--surface); border: 1px solid var(--border); padding: 48px; max-width: 540px; margin: 0 auto; }
+
+  /* INVENTORY FILTER */
+  .filter-bar { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 40px; align-items: center; }
+  .filter-bar select, .filter-bar input { padding: 10px 16px; border: 1px solid var(--border); background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--text); outline: none; }
+  .filter-bar select:focus, .filter-bar input:focus { border-color: var(--accent); }
+
+  /* BLOG */
+  .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 32px; margin-top: 48px; }
+  .blog-card { border-bottom: 2px solid transparent; transition: border-color 0.2s; cursor: pointer; }
+  .blog-card:hover { border-color: var(--accent); }
+  .blog-img { height: 220px; background: linear-gradient(135deg, #f0ebe2, #e0d8c8); display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 20px; }
+  .blog-meta { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .blog-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 600; margin-bottom: 12px; line-height: 1.3; }
+  .blog-excerpt { font-size: 0.87rem; color: var(--muted); line-height: 1.7; }
+
+  /* VIDEO */
+  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; margin-top: 48px; }
+  .video-container {
+    position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
+    background: #000; border-radius: 4px;
+  }
+  .video-container iframe, .video-container video {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
+  }
+
+  /* MOBILE MKT */
+  .mobile-features { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 32px; margin-top: 48px; }
+  .feature-item { padding: 32px; border: 1px solid var(--border); background: var(--surface); transition: border-color 0.3s; }
+  .feature-item:hover { border-color: var(--accent); }
+  .feature-icon { font-size: 2rem; margin-bottom: 16px; }
+  .feature-title { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 600; margin-bottom: 10px; }
+  .feature-text { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+  /* AFFILIATE */
+  .aff-tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+  .aff-tier { padding: 40px 32px; border: 1px solid var(--border); background: var(--surface); text-align: center; position: relative; transition: all 0.3s; }
+  .aff-tier.featured { border-color: var(--accent); background: var(--text); color: #fff; }
+  .aff-tier.featured .tier-sub { color: rgba(255,255,255,0.5); }
+  .tier-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 14px; }
+  .tier-name { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 600; margin-bottom: 4px; }
+  .tier-commission { font-size: 2.5rem; font-weight: 700; color: var(--accent); margin: 16px 0; }
+  .tier-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 24px; }
+  .tier-perks { list-style: none; font-size: 0.84rem; margin-bottom: 28px; }
+  .tier-perks li { padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
+  .aff-tier.featured .tier-perks li { border-color: rgba(255,255,255,0.1); }
+
+  /* FOOTER */
+  footer { background: var(--text); color: rgba(255,255,255,0.8); padding: 80px 80px 40px; margin-top: auto; }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 60px; }
+  .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; color: #fff; margin-bottom: 16px; }
+  .footer-logo span { color: var(--accent); }
+  .footer-desc { font-size: 0.85rem; color: rgba(255,255,255,0.45); line-height: 1.7; max-width: 280px; }
+  .footer-col h4 { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 20px; }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 10px; }
+  .footer-col ul li a { font-size: 0.85rem; color: rgba(255,255,255,0.6); text-decoration: none; cursor: pointer; transition: color 0.2s; }
+  .footer-col ul li a:hover { color: var(--accent); }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 32px; display: flex; justify-content: space-between; align-items: center; }
+  .footer-copy { font-size: 0.78rem; color: rgba(255,255,255,0.3); }
+  .social-links { display: flex; gap: 16px; }
+  .social-link {
+    width: 36px; height: 36px; border: 1px solid rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    font-size: 0.75rem; color: rgba(255,255,255,0.4); transition: all 0.2s; text-decoration: none;
+  }
+  .social-link:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 32px; right: 32px; background: var(--text); color: #fff; padding: 14px 24px; font-size: 0.85rem; z-index: 999; opacity: 0; transform: translateY(16px); transition: all 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  @media(max-width:768px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .hero, .section, .section-sm { padding-left: 24px; padding-right: 24px; }
+    .hero { padding-top: 40px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    footer { padding: 60px 24px 32px; }
+    .aff-tiers { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .divider { margin: 0 24px; }
+    .stats-bar { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">Auto<span>Elite</span></div>
+  <ul class="nav-links">
+    <li><a onclick="showPage('home')" id="nav-home" class="active">Home</a></li>
+    <li><a onclick="showPage('inventory')" id="nav-inventory">Inventory</a></li>
+    <li><a onclick="showPage('affiliate')" id="nav-affiliate">Affiliate</a></li>
+    <li><a onclick="showPage('blog')" id="nav-blog">Blog</a></li>
+    <li><a onclick="showPage('mobile')" id="nav-mobile">Mobile</a></li>
+    <li><a onclick="showPage('video')" id="nav-video">Video</a></li>
+  </ul>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-accent"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Premium Car Dealership</p>
+      <h1 class="hero-title">Drive Your<strong>Perfect Car</strong></h1>
+      <p class="hero-sub">Discover an exceptional collection of luxury and performance vehicles, curated for those who demand the best.</p>
+      <div>
+        <button class="btn-primary" onclick="showPage('inventory')">Browse Inventory</button>
+        <button class="btn-outline" onclick="showToast('Test drive requested! We will be in touch.')">Book a Test Drive</button>
+      </div>
+    </div>
+    <div class="stats-bar">
+      <div class="stat"><div class="stat-num">500+</div><div class="stat-label">Vehicles in Stock</div></div>
+      <div class="stat"><div class="stat-num">12K</div><div class="stat-label">Happy Customers</div></div>
+      <div class="stat"><div class="stat-num">18</div><div class="stat-label">Years of Excellence</div></div>
+      <div class="stat"><div class="stat-num">98%</div><div class="stat-label">Satisfaction Rate</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <p class="section-eyebrow">Featured Vehicles</p>
+    <h2 class="section-title">Hand-Picked Selection</h2>
+    <p class="section-sub">Every vehicle in our showroom passes a 150-point inspection. Quality is non-negotiable.</p>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-img">
+          <img src="images/Mercedes-Benz S-Class.jfif" alt="Mercedes-Benz S-Class" />
+        </div>
+        <div class="card-body">
+          <div class="card-tag">New Arrival</div>
+          <div class="card-title">Mercedes-Benz S-Class</div>
+          <div class="card-text">2024 · Obsidian Black · 3.0L Turbo</div>
+          <div class="card-price">From <span>$94,900</span></div>
+        </div>
+        <div class="card-footer">
+          <span style="font-size:0.75rem;color:var(--muted)">12 in stock</span>
+          <button class="btn-primary" style="padding:10px 20px;font-size:0.75rem" onclick="showPage('inventory')">View</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-img">
+          <img src="images/BMW 7 Series.jfif" alt="BMW 7 Series" />
+        </div>
+        <div class="card-body">
+          <div class="card-tag">Best Seller</div>
+          <div class="card-title">BMW 7 Series</div>
+          <div class="card-text">2024 · Alpine White · 4.4L V8</div>
+          <div class="card-price">From <span>$87,500</span></div>
+        </div>
+        <div class="card-footer">
+          <span style="font-size:0.75rem;color:var(--muted)">8 in stock</span>
+          <button class="btn-primary" style="padding:10px 20px;font-size:0.75rem" onclick="showPage('inventory')">View</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-img">
+          <img src="images/Tesla Model S Plaid.jfif" alt="Tesla Model S Plaid" />
+        </div>
+        <div class="card-body">
+          <div class="card-tag">Electric</div>
+          <div class="card-title">Tesla Model S Plaid</div>
+          <div class="card-text">2024 · Midnight Silver · Tri Motor</div>
+          <div class="card-price">From <span>$109,990</span></div>
+        </div>
+        <div class="card-footer">
+          <span style="font-size:0.75rem;color:var(--muted)">5 in stock</span>
+          <button class="btn-primary" style="padding:10px 20px;font-size:0.75rem" onclick="showPage('inventory')">View</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <p class="section-eyebrow">Why AutoElite</p>
+    <h2 class="section-title">The AutoElite Difference</h2>
+    <div class="mobile-features" style="margin-top:40px">
+      <div class="feature-item"><div class="feature-icon">🔍</div><div class="feature-title">150-Point Inspection</div><div class="feature-text">Every vehicle passes our rigorous quality check before it enters our showroom.</div></div>
+      <div class="feature-item"><div class="feature-icon">💰</div><div class="feature-title">Best Price Guarantee</div><div class="feature-text">We match any competitor's price within 7 days of purchase.</div></div>
+      <div class="feature-item"><div class="feature-icon">🛡️</div><div class="feature-title">5-Year Warranty</div><div class="feature-text">Comprehensive coverage from day one for your total peace of mind.</div></div>
+      <div class="feature-item"><div class="feature-icon">🚀</div><div class="feature-title">Same-Day Delivery</div><div class="feature-text">Your dream car delivered to your door — often the same day you buy.</div></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-grid">
+      <div><div class="footer-logo">Auto<span>Elite</span></div><p class="footer-desc">Premium vehicles for discerning drivers. Serving the community with excellence since 2006.</p></div>
+      <div class="footer-col"><h4>Navigate</h4><ul><li><a onclick="showPage('home')">Home</a></li><li><a onclick="showPage('inventory')">Inventory</a></li><li><a onclick="showPage('blog')">Blog</a></li></ul></div>
+      <div class="footer-col"><h4>Services</h4><ul><li><a onclick="showPage('affiliate')">Affiliate</a></li><li><a onclick="showPage('mobile')">Mobile Marketing</a></li><li><a onclick="showPage('video')">Video Marketing</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a>+1 (800) 555-AUTO</a></li><li><a>info@autoelite.com</a></li><li><a>123 Motor Avenue, CA</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2024 AutoElite. All rights reserved.</p>
+      <div class="social-links">
+        <a class="social-link">f</a><a class="social-link">in</a><a class="social-link">ig</a><a class="social-link">yt</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<div class="page" id="page-inventory">
+  <div class="section">
+    <p class="section-eyebrow">Browse Our Fleet</p>
+    <h2 class="section-title">Vehicle Inventory</h2>
+    <p class="section-sub">Filter through our extensive collection to find your perfect match.</p>
+    <div class="filter-bar" style="margin-top:32px">
+      <select onchange="filterInventory()"><option value="">All Makes</option><option>Mercedes-Benz</option><option>BMW</option><option>Tesla</option><option>Audi</option><option>Porsche</option></select>
+      <select onchange="filterInventory()"><option value="">All Types</option><option>Sedan</option><option>SUV</option><option>Coupe</option><option>Electric</option></select>
+      <select onchange="filterInventory()"><option value="">Price Range</option><option>Under $50K</option><option>$50K–$100K</option><option>$100K+</option></select>
+      <input type="text" placeholder="Search by model..." oninput="filterInventory()" style="flex:1;min-width:180px"/>
+    </div>
+    <div class="cards-grid" id="inv-grid">
+      <div class="card"><div class="card-img"><img src="images/Mercedes-Benz S-Class.jfif" alt="Mercedes S-Class"></div><div class="card-body"><div class="card-tag">New · Sedan</div><div class="card-title">Mercedes S-Class</div><div class="card-text">2024 · 3.0L Turbo · Auto</div><div class="card-price">$94,900</div></div><div class="card-footer"><span style="font-size:0.75rem;color:var(--muted)">● Available</span><button class="btn-primary" style="padding:9px 18px;font-size:0.73rem" onclick="showToast('Test drive requested!')">Book Test Drive</button></div></div>
+      <div class="card"><div class="card-img"><img src="images/BMW 7 Series.jfif" alt="BMW 7 Series"></div><div class="card-body"><div class="card-tag">New · Sedan</div><div class="card-title">BMW 7 Series</div><div class="card-text">2024 · 4.4L V8 · Auto</div><div class="card-price">$87,500</div></div><div class="card-footer"><span style="font-size:0.75rem;color:var(--muted)">● Available</span><button class="btn-primary" style="padding:9px 18px;font-size:0.73rem" onclick="showToast('Test drive requested!')">Book Test Drive</button></div></div>
+      <div class="card"><div class="card-img"><img src="images/Tesla Model S Plaid.jfif" alt="Tesla Model S"></div><div class="card-body"><div class="card-tag">New · Electric</div><div class="card-title">Tesla Model S Plaid</div><div class="card-text">2024 · Tri Motor · Auto</div><div class="card-price">$109,990</div></div><div class="card-footer"><span style="font-size:0.75rem;color:var(--muted)">● Available</span><button class="btn-primary" style="padding:9px 18px;font-size:0.73rem" onclick="showToast('Test drive requested!')">Book Test Drive</button></div></div>
+      <div class="card"><div class="card-img"><img src="images/Porsche Cayenne GTS.jfif" alt="Porsche Cayenne"></div><div class="card-body"><div class="card-tag">Used · SUV</div><div class="card-title">Porsche Cayenne GTS</div><div class="card-text">2023 · 4.0L V8 · AWD</div><div class="card-price">$119,000</div></div><div class="card-footer"><span style="font-size:0.75rem;color:var(--muted)">● Available</span><button class="btn-primary" style="padding:9px 18px;font-size:0.73rem" onclick="showToast('Test drive requested!')">Book Test Drive</button></div></div>
+      <div class="card"><div class="card-img"><img src="images/Audi RS e-tron GT.jfif" alt="Audi RS"></div><div class="card-body"><div class="card-tag">New · Coupe</div><div class="card-title">Audi RS e-tron GT</div><div class="card-text">2024 · Dual Motor · Auto</div><div class="card-price">$148,000</div></div><div class="card-footer"><span style="font-size:0.75rem;color:var(--muted)">● Available</span><button class="btn-primary" style="padding:9px 18px;font-size:0.73rem" onclick="showToast('Test drive requested!')">Book Test Drive</button></div></div>
+      <div class="card"><div class="card-img"><img src="images/Porsche 911 Turbo S.jfif" alt="Porsche 911"></div><div class="card-body"><div class="card-tag">New · Coupe</div><div class="card-title">Porsche 911 Turbo S</div><div class="card-text">2024 · 3.8L Twin-Turbo</div><div class="card-price">$226,700</div></div><div class="card-footer"><span style="font-size:0.75rem;color:var(--muted)">● Available</span><button class="btn-primary" style="padding:9px 18px;font-size:0.73rem" onclick="showToast('Test drive requested!')">Book Test Drive</button></div></div>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-grid">
+      <div><div class="footer-logo">Auto<span>Elite</span></div><p class="footer-desc">Premium vehicles for discerning drivers. Serving the community with excellence since 2006.</p></div>
+      <div class="footer-col"><h4>Navigate</h4><ul><li><a onclick="showPage('home')">Home</a></li><li><a onclick="showPage('inventory')">Inventory</a></li><li><a onclick="showPage('blog')">Blog</a></li></ul></div>
+      <div class="footer-col"><h4>Services</h4><ul><li><a onclick="showPage('affiliate')">Affiliate</a></li><li><a onclick="showPage('mobile')">Mobile Marketing</a></li><li><a onclick="showPage('video')">Video Marketing</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a>+1 (800) 555-AUTO</a></li><li><a>info@autoelite.com</a></li><li><a>123 Motor Avenue, CA</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p class="footer-copy">© 2024 AutoElite. All rights reserved.</p><div class="social-links"><a class="social-link">f</a><a class="social-link">in</a><a class="social-link">ig</a><a class="social-link">yt</a></div></div>
+  </footer>
+</div>
+
+<div class="page" id="page-affiliate">
+  <div class="section">
+    <p class="section-eyebrow">Partner With Us</p>
+    <h2 class="section-title">Affiliate Program</h2>
+    <p class="section-sub">Earn premium commissions by referring customers to AutoElite. Three tiers — built for every level of partner.</p>
+    <div class="aff-tiers">
+      <div class="aff-tier">
+        <div class="tier-name">Silver</div>
+        <div class="tier-commission">3%</div>
+        <div class="tier-sub">Per referred sale</div>
+        <ul class="tier-perks">
+          <li>Referral dashboard</li><li>Marketing materials</li><li>Monthly payouts</li><li>Email support</li>
+        </ul>
+        <button class="btn-outline" onclick="showToast('Application submitted!')" style="width:100%">Join Free</button>
+      </div>
+      <div class="aff-tier featured">
+        <div class="tier-badge">Most Popular</div>
+        <div class="tier-name">Gold</div>
+        <div class="tier-commission">6%</div>
+        <div class="tier-sub">Per referred sale</div>
+        <ul class="tier-perks">
+          <li>Everything in Silver</li><li>Priority onboarding</li><li>Weekly payouts</li><li>Dedicated manager</li>
+        </ul>
+        <button class="btn-primary" onclick="showToast('Application submitted!')" style="width:100%">Join Gold</button>
+      </div>
+      <div class="aff-tier">
+        <div class="tier-name">Platinum</div>
+        <div class="tier-commission">10%</div>
+        <div class="tier-sub">Per referred sale</div>
+        <ul class="tier-perks">
+          <li>Everything in Gold</li><li>Custom landing pages</li><li>Daily payouts</li><li>Co-marketing budget</li>
+        </ul>
+        <button class="btn-outline" onclick="showToast('Application submitted!')" style="width:100%">Apply Now</button>
+      </div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="section">
+    <p class="section-eyebrow">Apply Today</p>
+    <h2 class="section-title" style="text-align:center">Become a Partner</h2>
+    <div class="form-box" style="margin-top:40px">
+      <div class="form-row">
+        <div class="form-group"><label>First Name</label><input type="text" placeholder="John"/></div>
+        <div class="form-group"><label>Last Name</label><input type="text" placeholder="Doe"/></div>
+      </div>
+      <div class="form-group"><label>Email</label><input type="email" placeholder="partner@example.com"/></div>
+      <div class="form-group"><label>Website / Social Profile</label><input type="url" placeholder="https://yoursite.com"/></div>
+      <div class="form-group"><label>Monthly Audience Size</label><select><option>Under 1,000</option><option>1K–10K</option><option>10K–100K</option><option>100K+</option></select></div>
+      <button class="btn-primary" style="width:100%;padding:14px;margin-top:8px" onclick="showToast('Application submitted! We will contact you shortly.')">Submit Application</button>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-grid">
+      <div><div class="footer-logo">Auto<span>Elite</span></div><p class="footer-desc">Premium vehicles for discerning drivers. Serving the community with excellence since 2006.</p></div>
+      <div class="footer-col"><h4>Navigate</h4><ul><li><a onclick="showPage('home')">Home</a></li><li><a onclick="showPage('inventory')">Inventory</a></li><li><a onclick="showPage('blog')">Blog</a></li></ul></div>
+      <div class="footer-col"><h4>Services</h4><ul><li><a onclick="showPage('affiliate')">Affiliate</a></li><li><a onclick="showPage('mobile')">Mobile Marketing</a></li><li><a onclick="showPage('video')">Video Marketing</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a>+1 (800) 555-AUTO</a></li><li><a>info@autoelite.com</a></li><li><a>123 Motor Avenue, CA</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p class="footer-copy">© 2024 AutoElite. All rights reserved.</p><div class="social-links"><a class="social-link">f</a><a class="social-link">in</a><a class="social-link">ig</a><a class="social-link">yt</a></div></div>
+  </footer>
+</div>
+
+<div class="page" id="page-blog">
+  <div class="section">
+    <p class="section-eyebrow">Insights & Stories</p>
+    <h2 class="section-title">The AutoElite Journal</h2>
+    <p class="section-sub">Expert advice, industry trends, and everything you need to make confident car-buying decisions.</p>
+    <div class="blog-grid">
+      <div class="blog-card" onclick="showToast('Full article coming soon!')">
+        <div class="blog-img">📰</div>
+        <div class="blog-meta">Buying Guide · June 12, 2024</div>
+        <div class="blog-title">10 Things to Check Before Buying a Luxury Car</div>
+        <div class="blog-excerpt">From hidden inspection points to financing traps — our experts reveal what dealers won't tell you.</div>
+      </div>
+      <div class="blog-card" onclick="showToast('Full article coming soon!')">
+        <div class="blog-img">⚡</div>
+        <div class="blog-meta">Electric Vehicles · June 8, 2024</div>
+        <div class="blog-title">EV vs Hybrid in 2024: Which Is Right for You?</div>
+        <div class="blog-excerpt">A practical breakdown of costs, range, charging infrastructure, and long-term ownership value.</div>
+      </div>
+      <div class="blog-card" onclick="showToast('Full article coming soon!')">
+        <div class="blog-img">🏆</div>
+        <div class="blog-meta">Industry · June 1, 2024</div>
+        <div class="blog-title">The Best Luxury Sedans Money Can Buy in 2024</div>
+        <div class="blog-excerpt">We drive and rank the top luxury sedans on the market so you don't have to guess.</div>
+      </div>
+      <div class="blog-card" onclick="showToast('Full article coming soon!')">
+        <div class="blog-img">💡</div>
+        <div class="blog-meta">Tips · May 28, 2024</div>
+        <div class="blog-title">How to Negotiate Car Price Like a Pro</div>
+        <div class="blog-excerpt">Dealership tricks decoded — walk in prepared and walk out with the deal you deserve.</div>
+      </div>
+      <div class="blog-card" onclick="showToast('Full article coming soon!')">
+        <div class="blog-img">🛡️</div>
+        <div class="blog-meta">Ownership · May 20, 2024</div>
+        <div class="blog-title">Is an Extended Warranty Worth It? The Truth</div>
+        <div class="blog-excerpt">We break down the math on extended warranties so you can decide with full information.</div>
+      </div>
+      <div class="blog-card" onclick="showToast('Full article coming soon!')">
+        <div class="blog-img">📊</div>
+        <div class="blog-meta">Market · May 15, 2024</div>
+        <div class="blog-title">2024 Car Market Outlook: Prices, Trends & Predictions</div>
+        <div class="blog-excerpt">Is now the right time to buy? Our analysts share what the data says about the 2024 auto market.</div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-grid">
+      <div><div class="footer-logo">Auto<span>Elite</span></div><p class="footer-desc">Premium vehicles for discerning drivers. Serving the community with excellence since 2006.</p></div>
+      <div class="footer-col"><h4>Navigate</h4><ul><li><a onclick="showPage('home')">Home</a></li><li><a onclick="showPage('inventory')">Inventory</a></li><li><a onclick="showPage('blog')">Blog</a></li></ul></div>
+      <div class="footer-col"><h4>Services</h4><ul><li><a onclick="showPage('affiliate')">Affiliate</a></li><li><a onclick="showPage('mobile')">Mobile Marketing</a></li><li><a onclick="showPage('video')">Video Marketing</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a>+1 (800) 555-AUTO</a></li><li><a>info@autoelite.com</a></li><li><a>123 Motor Avenue, CA</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p class="footer-copy">© 2024 AutoElite. All rights reserved.</p><div class="social-links"><a class="social-link">f</a><a class="social-link">in</a><a class="social-link">ig</a><a class="social-link">yt</a></div></div>
+  </footer>
+</div>
+
+<div class="page" id="page-mobile">
+  <div class="section">
+    <p class="section-eyebrow">Mobile Strategy</p>
+    <h2 class="section-title">Mobile Marketing Solutions</h2>
+    <p class="section-sub">Reach your customers wherever they are. Our mobile-first marketing channels deliver measurable results.</p>
+    <div class="mobile-features">
+      <div class="feature-item"><div class="feature-icon">📱</div><div class="feature-title">SMS Campaigns</div><div class="feature-text">Targeted text campaigns with 98% open rates — ideal for flash sales, test drive reminders, and follow-ups.</div></div>
+      <div class="feature-item"><div class="feature-icon">🔔</div><div class="feature-title">Push Notifications</div><div class="feature-text">Real-time alerts for new inventory, price drops, and exclusive offers sent directly to opted-in customers.</div></div>
+      <div class="feature-item"><div class="feature-icon">📍</div><div class="feature-title">Geo-Targeting</div><div class="feature-text">Serve ads to prospects within a defined radius of our dealership with hyper-local precision.</div></div>
+      <div class="feature-item"><div class="feature-icon">📲</div><div class="feature-title">Mobile Display Ads</div><div class="feature-text">Premium mobile ad placements on high-traffic automotive and lifestyle apps and websites.</div></div>
+      <div class="feature-item"><div class="feature-icon">💬</div><div class="feature-title">WhatsApp Marketing</div><div class="feature-text">Two-way conversations at scale — send vehicle showcases, schedule viewings, and answer questions instantly.</div></div>
+      <div class="feature-item"><div class="feature-icon">📊</div><div class="feature-title">Analytics & Reporting</div><div class="feature-text">Full-funnel mobile attribution: from first click to keys-in-hand, track every conversion precisely.</div></div>
+    </div>
+  </div>
+  <div style="background:var(--text);padding:80px;text-align:center">
+    <p style="font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:12px">Get Started</p>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;color:#fff;margin-bottom:16px">Ready to Go Mobile?</h2>
+    <p style="font-size:0.95rem;color:rgba(255,255,255,0.5);max-width:480px;margin:0 auto 32px;line-height:1.7">Let our team build a mobile marketing strategy tailored to your dealership's goals.</p>
+    <button class="btn-primary" style="background:var(--accent);padding:16px 48px" onclick="showToast('Our team will reach out within 24 hours!')">Request a Strategy Call</button>
+  </div>
+  <footer>
+    <div class="footer-grid">
+      <div><div class="footer-logo">Auto<span>Elite</span></div><p class="footer-desc">Premium vehicles for discerning drivers. Serving the community with excellence since 2006.</p></div>
+      <div class="footer-col"><h4>Navigate</h4><ul><li><a onclick="showPage('home')">Home</a></li><li><a onclick="showPage('inventory')">Inventory</a></li><li><a onclick="showPage('blog')">Blog</a></li></ul></div>
+      <div class="footer-col"><h4>Services</h4><ul><li><a onclick="showPage('affiliate')">Affiliate</a></li><li><a onclick="showPage('mobile')">Mobile Marketing</a></li><li><a onclick="showPage('video')">Video Marketing</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a>+1 (800) 555-AUTO</a></li><li><a>info@autoelite.com</a></li><li><a>123 Motor Avenue, CA</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p class="footer-copy">© 2024 AutoElite. All rights reserved.</p><div class="social-links"><a class="social-link">f</a><a class="social-link">in</a><a class="social-link">ig</a><a class="social-link">yt</a></div></div>
+  </footer>
+</div>
+
+<div class="page" id="page-video">
+  <div class="section">
+    <p class="section-eyebrow">Video Strategy</p>
+    <h2 class="section-title">Video Marketing Hub</h2>
+    <p class="section-sub">From cinematic walkarounds to YouTube pre-rolls — we create video content that sells cars.</p>
+    <div class="video-grid">
+      <div>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/tgbNymZ7vqY?si=GzKx1U_6qgU9A_z0" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div style="padding:16px 0"><div style="font-size:0.85rem;font-weight:500">Mercedes S-Class 2024 Walkaround</div><div style="font-size:0.75rem;color:var(--muted);margin-top:4px">8:24 · 142K views</div></div>
+      </div>
+      <div>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/jZ0wZ65aWxc?si=O7eJ2b_kO4E5Xz8J" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div style="padding:16px 0"><div style="font-size:0.85rem;font-weight:500">BMW 7 Series Highway Test</div><div style="font-size:0.75rem;color:var(--muted);margin-top:4px">12:05 · 98K views</div></div>
+      </div>
+      <div>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/M7lc1UVf-VE?si=9l3p8a_gA8_hB6_I" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div style="padding:16px 0"><div style="font-size:0.85rem;font-weight:500">Tesla Model S Plaid — Is It Worth It?</div><div style="font-size:0.75rem;color:var(--muted);margin-top:4px">15:42 · 260K views</div></div>
+      </div>
+      <div>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/tgbNymZ7vqY?si=GzKx1U_6qgU9A_z0" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div style="padding:16px 0"><div style="font-size:0.85rem;font-weight:500">Porsche 911 vs BMW M4 — Battle</div><div style="font-size:0.75rem;color:var(--muted);margin-top:4px">18:30 · 378K views</div></div>
+      </div>
+      <div>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/jZ0wZ65aWxc?si=O7eJ2b_kO4E5Xz8J" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div style="padding:16px 0"><div style="font-size:0.85rem;font-weight:500">5 Things to Check Before Buying Used</div><div style="font-size:0.75rem;color:var(--muted);margin-top:4px">6:18 · 55K views</div></div>
+      </div>
+      <div>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/M7lc1UVf-VE?si=9l3p8a_gA8_hB6_I" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div style="padding:16px 0"><div style="font-size:0.85rem;font-weight:500">Inside Our 150-Point Inspection</div><div style="font-size:0.75rem;color:var(--muted);margin-top:4px">9:55 · 44K views</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="section">
+    <p class="section-eyebrow">Our Services</p>
+    <h2 class="section-title">Video Production Services</h2>
+    <div class="mobile-features" style="margin-top:40px">
+      <div class="feature-item"><div class="feature-icon">🎬</div><div class="feature-title">Cinematic Walkarounds</div><div class="feature-text">Professional-grade vehicle showcase videos that make every detail shine on screen.</div></div>
+      <div class="feature-item"><div class="feature-icon">📺</div><div class="feature-title">YouTube Campaigns</div><div class="feature-text">Pre-roll and in-stream ads targeting in-market car buyers on YouTube's massive platform.</div></div>
+      <div class="feature-item"><div class="feature-icon">🎯</div><div class="feature-title">Social Video Ads</div><div class="feature-text">Short-form video content optimized for Instagram Reels, TikTok, and Facebook.</div></div>
+      <div class="feature-item"><div class="feature-icon">📡</div><div class="feature-title">Live Streaming</div><div class="feature-text">Real-time vehicle unveilings, Q&A sessions, and virtual showroom tours streamed live.</div></div>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-grid">
+      <div><div class="footer-logo">Auto<span>Elite</span></div><p class="footer-desc">Premium vehicles for discerning drivers. Serving the community with excellence since 2006.</p></div>
+      <div class="footer-col"><h4>Navigate</h4><ul><li><a onclick="showPage('home')">Home</a></li><li><a onclick="showPage('inventory')">Inventory</a></li><li><a onclick="showPage('blog')">Blog</a></li></ul></div>
+      <div class="footer-col"><h4>Services</h4><ul><li><a onclick="showPage('affiliate')">Affiliate</a></li><li><a onclick="showPage('mobile')">Mobile Marketing</a></li><li><a onclick="showPage('video')">Video Marketing</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a>+1 (800) 555-AUTO</a></li><li><a>info@autoelite.com</a></li><li><a>123 Motor Avenue, CA</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p class="footer-copy">© 2024 AutoElite. All rights reserved.</p><div class="social-links"><a class="social-link">f</a><a class="social-link">in</a><a class="social-link">ig</a><a class="social-link">yt</a></div></div>
+  </footer>
+</div>
+
+<script>
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    const navEl = document.getElementById('nav-' + id);
+    if (navEl) navEl.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function filterInventory() {
+    showToast('Filtering inventory…');
+  }
+</script>
+</body>
+</html>
